@@ -5,7 +5,6 @@ import java.util.*;
 public class EvenForest {
     private record Edge(int from, int to) {} // comment this if you are using Java 8
     public static int evenForest(int t_nodes, int t_edges, List<Integer> t_from, List<Integer> t_to) {
-        Map<Integer, Integer> nodeDimensions = new HashMap<>(t_nodes);
 //        class Edge { // uncomment this if you are using Java 8
 //            int from;
 //            int to;
@@ -22,16 +21,9 @@ public class EvenForest {
             edges.add( new Edge( Math.max(from, to), Math.min(from, to) ) );
         }
 
-        edges.sort(
-                Comparator.comparingInt((Edge edge) -> edge.from).reversed()
-        );
+        edges.sort( Comparator.comparingInt((Edge edge) -> edge.from).reversed() );
 
-        for (Edge edge : edges) {
-            int fromNode = edge.from;
-            int toNode = edge.to;
-            nodeDimensions.put(fromNode, nodeDimensions.getOrDefault(fromNode, 1));
-            nodeDimensions.put(toNode, nodeDimensions.getOrDefault(toNode, 1)+ nodeDimensions.get(fromNode));
-        }
+        Map<Integer, Integer> nodeDimensions = evaluateNodeDimensions(t_nodes, edges);
 
         int cutEdges = 0;
         for (Map.Entry<Integer, Integer> entry : nodeDimensions.entrySet()) {
@@ -40,5 +32,16 @@ public class EvenForest {
             cutEdges++;
         }
         return cutEdges;
+    }
+
+    private static Map<Integer, Integer> evaluateNodeDimensions(int t_nodes, ArrayList<Edge> edges) {
+        Map<Integer, Integer> nodeDimensions = new HashMap<>(t_nodes);
+        for (Edge edge : edges) {
+            int fromNode = edge.from;
+            int toNode = edge.to;
+            nodeDimensions.put(fromNode, nodeDimensions.getOrDefault(fromNode, 1));
+            nodeDimensions.put(toNode, nodeDimensions.getOrDefault(toNode, 1) + nodeDimensions.get(fromNode));
+        }
+        return nodeDimensions;
     }
 }
